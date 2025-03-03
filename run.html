@@ -2,48 +2,30 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <!-- ビューポート設定でモバイル表示崩れを防止 -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>エンドレスランナーゲーム</title>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
       overflow: hidden;
       background-color: #f0f0f0;
     }
     canvas {
       display: block;
+      margin: 0 auto;
       background: #fff;
       border: 1px solid #000;
     }
   </style>
 </head>
 <body>
-  <canvas id="gameCanvas"></canvas>
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    // キャンバスサイズを画面いっぱいに設定
-    let groundHeight; // 後でcanvas高さに応じて再設定
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      groundHeight = canvas.height * 0.1;  // 地面の高さは画面の10%
-      // ゲーム中でなければプレイヤーの位置も再設定
-      if (!gameOver) {
-        player.y = canvas.height - groundHeight - player.height;
-      }
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
     let gameOver = false;
 
-    // プレイヤーの設定（衝突判定用の矩形）
+    // プレイヤーの設定（衝突判定用の矩形はそのまま利用）
     const player = {
       x: 50,
       y: 0,
@@ -53,26 +35,25 @@
       jumpStrength: -15,
       gravity: 0.8
     };
+
+    const groundHeight = 50;
     player.y = canvas.height - groundHeight - player.height;
 
-    // 床のストライプ用変数（床が動いている演出用）
+    // 床のストライプ用変数（床が動いてる感じを演出）
     let groundOffset = 0;
     const stripeSpacing = 40;  // ストライプの間隔
     const stripeWidth = 20;    // ストライプの幅
     const stripeHeight = 5;    // ストライプの高さ
 
-    // 障害物配列
+    // 障害物を格納する配列
     let obstacles = [];
     let obstacleTimer = 0;
     let obstacleInterval = 1500; // 障害物生成間隔（ミリ秒）
 
     // ゲームスピード
     const gameSpeed = 5;
-    
-    // 距離
-    let distance = 0;
 
-    // キーボード操作（Enterキー）でジャンプまたはリセット
+    // エンターキー（"Enter"）でジャンプまたは再スタート
     document.addEventListener('keydown', function(e) {
       if(e.key === 'Enter') {
         if (!gameOver) {
@@ -86,19 +67,7 @@
       }
     });
 
-    // タップ操作にも対応（スマホ用）
-    canvas.addEventListener('touchstart', function(e) {
-      if (!gameOver) {
-        if (player.y === canvas.height - groundHeight - player.height) {
-          player.velocityY = player.jumpStrength;
-        }
-      } else {
-        resetGame();
-      }
-      e.preventDefault();
-    }, {passive: false});
-
-    // 障害物生成関数
+    // 新しい障害物を生成する関数
     function createObstacle() {
       const height = 30 + Math.random() * 30;
       const width = 20 + Math.random() * 30;
@@ -119,7 +88,7 @@
              rect1.y + rect1.height > rect2.y;
     }
 
-    // スティックフィギュアの描画
+    // シンプルな人（スティックフィギュア）の描画関数
     function drawPerson(ctx, x, y, width, height) {
       // 頭
       const headRadius = 10;
@@ -164,7 +133,6 @@
       player.velocityY = 0;
       obstacleTimer = 0;
       groundOffset = 0;
-      distance = 0;
       lastTime = 0;
       requestAnimationFrame(gameLoop);
     }
@@ -176,14 +144,14 @@
       const deltaTime = timestamp - lastTime;
       lastTime = timestamp;
       
-      // キャンバス全体をクリア
+      // キャンバスをクリア
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // 床の描画
+      // 床の描画（基本の床）
       ctx.fillStyle = '#654321';
       ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
       
-      // 床ストライプの描画
+      // 床に動きを出すためのストライプの描画
       groundOffset = (groundOffset + gameSpeed) % stripeSpacing;
       for (let i = 0; i < canvas.width / stripeSpacing + 1; i++) {
          let stripeX = i * stripeSpacing - groundOffset;
@@ -191,29 +159,29 @@
          ctx.fillRect(stripeX, canvas.height - groundHeight + (groundHeight - stripeHeight) / 2, stripeWidth, stripeHeight);
       }
       
-      // プレイヤーの物理処理
+      // プレイヤーの物理処理（重力・位置更新）
       player.velocityY += player.gravity;
       player.y += player.velocityY;
       
-      // 地面に衝突したら位置調整
+      // 地面に衝突したら調整
       if (player.y > canvas.height - groundHeight - player.height) {
         player.y = canvas.height - groundHeight - player.height;
         player.velocityY = 0;
       }
       
-      // プレイヤー（スティックフィギュア）の描画
+      // プレイヤー（人）の描画
       ctx.lineWidth = 2;
       ctx.strokeStyle = '#000';
       drawPerson(ctx, player.x, player.y, player.width, player.height);
       
-      // 障害物生成
+      // 障害物の生成
       obstacleTimer += deltaTime;
       if (obstacleTimer > obstacleInterval) {
         createObstacle();
         obstacleTimer = 0;
       }
       
-      // 障害物の更新・描画＆衝突判定
+      // 障害物の更新と描画
       for (let i = obstacles.length - 1; i >= 0; i--) {
         let obs = obstacles[i];
         obs.x -= gameSpeed;
@@ -232,26 +200,16 @@
         }
       }
       
-      // 距離更新
-      distance += gameSpeed;
-      
-      // 距離表示（右寄せ）
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#000';
-      ctx.font = '24px sans-serif';
-      ctx.fillText('距離: ' + Math.floor(distance) + ' m', canvas.width - 10, 30);
-      
       // ゲームオーバー時の処理
       if (gameOver) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#FFF';
-        ctx.textAlign = 'center';
         ctx.font = '48px sans-serif';
-        ctx.fillText('ゲームオーバー', canvas.width / 2, canvas.height / 2 - 40);
+        ctx.textAlign = 'center';
+        ctx.fillText('ゲームオーバー', canvas.width / 2, canvas.height / 2);
         ctx.font = '24px sans-serif';
-        ctx.fillText('最終距離: ' + Math.floor(distance) + ' m', canvas.width / 2, canvas.height / 2);
-        ctx.fillText('エンターボタンまたはタップでリセット', canvas.width / 2, canvas.height / 2 + 40);
+        ctx.fillText('エンターボタンでリセット', canvas.width / 2, canvas.height / 2 + 40);
         return;
       }
       
@@ -263,3 +221,4 @@
   </script>
 </body>
 </html>
+
