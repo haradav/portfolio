@@ -3,45 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LINE風チャットUI</title>
+  <title>LINE風チャットUI (Blue Sky Background)</title>
   <style>
-    /* 全体のスタイル */
+    /* ページ全体の設定 */
     body {
       margin: 0;
       padding: 0;
-      background-color: #e5ddd5;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    }
-    .chat-container {
-      max-width: 600px;
       height: 100vh;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      background-color: #fff;
-      border: 1px solid #ccc;
+      /* 青空をイメージしたグラデーション背景 */
+      background: linear-gradient(to bottom, #87CEEB, #B0E0E6);
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      position: relative;
     }
-    /* ヘッダー */
+    /* ヘッダー（常に上部に固定） */
     .chat-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
       background-color: #00c300;
       color: #fff;
       text-align: center;
-      padding: 15px;
+      line-height: 50px;
       font-size: 18px;
       font-weight: bold;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    /* メッセージエリア */
+    /* メッセージエリア（ヘッダーと入力エリアの間に配置、スクロール可能） */
     .chat-messages {
-      flex: 1;
+      position: absolute;
+      top: 50px;       /* ヘッダーの高さ分下げる */
+      bottom: 50px;    /* 入力エリアの高さ分上げる */
+      left: 0;
+      right: 0;
       padding: 10px;
-      background-color: #e5ddd5;
       overflow-y: auto;
     }
+    /* 吹き出しの基本スタイル */
     .message {
       display: flex;
       margin-bottom: 10px;
     }
-    /* 左側のメッセージ（相手側） */
+    /* 左側のメッセージ（受信側） */
     .message.left {
       justify-content: flex-start;
     }
@@ -53,53 +58,59 @@
       flex-shrink: 0;
     }
     .message.left .bubble {
-      background-color: #fff;
+      background-color: rgba(255, 255, 255, 0.9);
       border: 1px solid #ddd;
       border-top-left-radius: 0;
       border-radius: 18px;
       padding: 10px;
       max-width: 70%;
-      position: relative;
       font-size: 14px;
       line-height: 1.4;
     }
-    /* 右側のメッセージ（自分側） */
+    /* 右側のメッセージ（送信側） */
     .message.right {
       justify-content: flex-end;
     }
     .message.right .bubble {
-      background-color: #dcf8c6;
+      background-color: rgba(220, 248, 198, 0.9);
       border: 1px solid #b2d8b2;
       border-top-right-radius: 0;
       border-radius: 18px;
       padding: 10px;
       max-width: 70%;
-      position: relative;
       font-size: 14px;
       line-height: 1.4;
     }
-    /* テキスト入力エリア */
+    /* 入力エリア（常に下部に固定） */
     .chat-input {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background-color: #f7f7f7;
+      border-top: 1px solid #ccc;
       display: flex;
       align-items: center;
-      border-top: 1px solid #ccc;
-      background-color: #f7f7f7;
+      padding: 0 10px;
+      z-index: 100;
     }
     .chat-input input[type="text"] {
       flex: 1;
       border: none;
-      padding: 15px;
       font-size: 16px;
+      padding: 10px;
       outline: none;
       background-color: #f7f7f7;
     }
     .chat-input button {
       border: none;
-      padding: 15px 20px;
+      padding: 10px 15px;
       background-color: #00c300;
       color: #fff;
       font-size: 16px;
       cursor: pointer;
+      margin-left: 10px;
       outline: none;
     }
     .chat-input button:active {
@@ -108,39 +119,52 @@
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <!-- ヘッダー -->
-    <div class="chat-header">
-      LINE Chat
+  <!-- ヘッダー -->
+  <div class="chat-header">
+    LINE Chat
+  </div>
+  
+  <!-- メッセージエリア -->
+  <div class="chat-messages">
+    <!-- 受信メッセージ -->
+    <div class="message left">
+      <img class="avatar" src="https://via.placeholder.com/40" alt="相手のアバター">
+      <div class="bubble">こんにちは！</div>
     </div>
-    
-    <!-- メッセージエリア -->
-    <div class="chat-messages">
-      <!-- 受信メッセージ -->
-      <div class="message left">
-        <img class="avatar" src="https://via.placeholder.com/40" alt="相手のアバター">
-        <div class="bubble">こんにちは！</div>
-      </div>
-      <!-- 送信メッセージ -->
-      <div class="message right">
-        <div class="bubble">こんにちは！元気ですか？</div>
-      </div>
-      <!-- 受信メッセージ -->
-      <div class="message left">
-        <img class="avatar" src="https://via.placeholder.com/40" alt="相手のアバター">
-        <div class="bubble">はい、元気です。あなたは？</div>
-      </div>
-      <!-- 送信メッセージ -->
-      <div class="message right">
-        <div class="bubble">僕も元気です！</div>
-      </div>
+    <!-- 送信メッセージ -->
+    <div class="message right">
+      <div class="bubble">こんにちは！元気ですか？</div>
     </div>
-    
-    <!-- テキスト入力エリア -->
-    <div class="chat-input">
-      <input type="text" placeholder="メッセージを入力">
-      <button>送信</button>
+    <!-- 受信メッセージ -->
+    <div class="message left">
+      <img class="avatar" src="https://via.placeholder.com/40" alt="相手のアバター">
+      <div class="bubble">はい、元気です。あなたは？</div>
     </div>
+    <!-- 送信メッセージ -->
+    <div class="message right">
+      <div class="bubble">僕も元気です！</div>
+    </div>
+    <!-- スクロール動作を確認するために追加のメッセージ -->
+    <div class="message left">
+      <img class="avatar" src="https://via.placeholder.com/40" alt="相手のアバター">
+      <div class="bubble">追加のメッセージです。</div>
+    </div>
+    <div class="message right">
+      <div class="bubble">了解！</div>
+    </div>
+    <div class="message left">
+      <img class="avatar" src="https://via.placeholder.com/40" alt="相手のアバター">
+      <div class="bubble">どうしてる？</div>
+    </div>
+    <div class="message right">
+      <div class="bubble">順調です。</div>
+    </div>
+  </div>
+  
+  <!-- 入力エリア -->
+  <div class="chat-input">
+    <input type="text" placeholder="メッセージを入力">
+    <button>送信</button>
   </div>
 </body>
 </html>
