@@ -2,169 +2,156 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LINE風チャットUI (Blue Sky Background)</title>
+  <title>LINE-like Chat</title>
   <style>
-    /* ページ全体の設定 */
-    body {
+    /* ベース設定 */
+    html, body {
       margin: 0;
       padding: 0;
-      height: 100vh;
-      /* 青空をイメージしたグラデーション背景 */
-      background: linear-gradient(to bottom, #87CEEB, #B0E0E6);
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      position: relative;
+      background-color: #E5E5E5; /* LINEのチャット背景に近いグレー */
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+                   "Segoe UI", Arial, sans-serif;
+      color: #333;
     }
-    /* ヘッダー（常に上部に固定） */
-    .chat-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 50px;
-      background-color: #00c300;
+
+    /* 画面全体のコンテナ */
+    .chat-container {
+      max-width: 375px; /* iPhone 8 などの幅を想定 */
+      margin: 0 auto;
+      background-color: #E5E5E5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ヘッダー部分 */
+    .header {
+      height: 56px; /* 実機ではステータスバー込みで60px以上になることも */
+      background-color: #00B900; /* LINEのブランドカラーに近い緑 */
       color: #fff;
-      text-align: center;
-      line-height: 50px;
-      font-size: 18px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 17px;
       font-weight: bold;
-      z-index: 100;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-sizing: border-box;
     }
-    /* メッセージエリア（ヘッダーと入力エリアの間に配置、スクロール可能） */
-    .chat-messages {
-      position: absolute;
-      top: 50px;       /* ヘッダーの高さ分下げる */
-      bottom: 50px;    /* 入力エリアの高さ分上げる */
-      left: 0;
-      right: 0;
-      padding: 10px;
-      overflow-y: auto;
+
+    /* チャットエリア（スクロール領域想定） */
+    .chat-area {
+      flex: 1;
+      padding: 10px 8px 70px; /* 下部に入力エリアを想定した余白 */
+      box-sizing: border-box;
     }
-    /* 吹き出しの基本スタイル */
+
+    /* メッセージ全体の枠 */
     .message {
       display: flex;
       margin-bottom: 10px;
+      align-items: flex-end; /* 時刻表示などの位置合わせ */
     }
-    /* 左側のメッセージ（受信側） */
-    .message.left {
-      justify-content: flex-start;
-    }
-    .message.left .avatar {
-      width: 40px;
-      height: 40px;
+
+    /* アイコン（左側に表示） */
+    .avatar {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
+      background-color: #ccc; /* 実際にはユーザー画像 */
       margin-right: 8px;
       flex-shrink: 0;
     }
-    .message.left .bubble {
-      background-color: rgba(255, 255, 255, 0.9);
-      border: 1px solid #ddd;
-      border-top-left-radius: 0;
-      border-radius: 18px;
-      padding: 10px;
+
+    /* 各種メッセージバブル共通 */
+    .bubble {
+      position: relative;
       max-width: 70%;
+      padding: 10px 14px;
       font-size: 14px;
+      border-radius: 18px;
       line-height: 1.4;
+      box-sizing: border-box;
+      word-wrap: break-word;
+      white-space: pre-wrap; /* 改行やスペースをそのまま扱う */
     }
-    /* 右側のメッセージ（送信側） */
-    .message.right {
+
+    /* 受信メッセージ */
+    .message.incoming {
+      justify-content: flex-start;
+    }
+    .message.incoming .bubble {
+      background-color: #fff;
+      border: 1px solid #ddd;
+    }
+
+    /* 送信メッセージ */
+    .message.outgoing {
       justify-content: flex-end;
     }
-    .message.right .bubble {
-      background-color: rgba(220, 248, 198, 0.9);
-      border: 1px solid #b2d8b2;
-      border-top-right-radius: 0;
-      border-radius: 18px;
-      padding: 10px;
-      max-width: 70%;
-      font-size: 14px;
-      line-height: 1.4;
+    .message.outgoing .bubble {
+      background-color: #9EEA6A; /* LINE送信バブルに近い緑 */
+      border: 1px solid #8cd65c;
     }
-    /* 入力エリア（常に下部に固定） */
-    .chat-input {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 50px;
-      background-color: #f7f7f7;
-      border-top: 1px solid #ccc;
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      z-index: 100;
+    /* 送信メッセージはアイコン非表示の場合が多い想定 */
+    .message.outgoing .avatar {
+      display: none;
     }
-    .chat-input input[type="text"] {
-      flex: 1;
-      border: none;
-      font-size: 16px;
-      padding: 10px;
-      outline: none;
-      background-color: #f7f7f7;
-    }
-    .chat-input button {
-      border: none;
-      padding: 10px 15px;
-      background-color: #00c300;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-      margin-left: 10px;
-      outline: none;
-    }
-    .chat-input button:active {
-      opacity: 0.8;
+
+    /* 時刻表示 */
+    .timestamp {
+      font-size: 12px;
+      color: #999;
+      margin-left: 6px;
+      flex-shrink: 0;
     }
   </style>
 </head>
 <body>
+
+<div class="chat-container">
   <!-- ヘッダー -->
-  <div class="chat-header">
-    LINE Chat
+  <div class="header">
+    ブリティッシュブルー
   </div>
-  
-  <!-- メッセージエリア -->
-  <div class="chat-messages">
+
+  <!-- チャット表示領域 -->
+  <div class="chat-area">
     <!-- 受信メッセージ -->
-    <div class="message left">
-      <img class="avatar" src="https://crowdworks.jp/attachments/48051778.png?width=552&height=552" alt="相手のアバター">
-      <div class="bubble">こんにちは！</div>
+    <div class="message incoming">
+      <div class="avatar"></div>
+      <div class="bubble">
+        こんばんにゃー 🐱
+      </div>
+      <div class="timestamp">11:48</div>
     </div>
+
     <!-- 送信メッセージ -->
-    <div class="message right">
-      <div class="bubble">こんにちは！元気ですか？</div>
+    <div class="message outgoing">
+      <div class="avatar"></div>
+      <div class="bubble">
+        こんにちは 🐱
+      </div>
+      <div class="timestamp">13:06</div>
     </div>
+
     <!-- 受信メッセージ -->
-    <div class="message left">
-      <img class="avatar" src="https://crowdworks.jp/attachments/48051778.png?width=552&height=552" alt="相手のアバター">
-      <div class="bubble">はい、元気です。あなたは？</div>
+    <div class="message incoming">
+      <div class="avatar"></div>
+      <div class="bubble">
+        こんにちはにゃー 🐱
+      </div>
+      <div class="timestamp">13:07</div>
     </div>
+
     <!-- 送信メッセージ -->
-    <div class="message right">
-      <div class="bubble">僕も元気です！</div>
-    </div>
-    <!-- スクロール動作を確認するために追加のメッセージ -->
-    <div class="message left">
-      <img class="avatar" src="https://crowdworks.jp/attachments/48051778.png?width=552&height=552" alt="相手のアバター">
-      <div class="bubble">追加のメッセージです。</div>
-    </div>
-    <div class="message right">
-      <div class="bubble">了解！</div>
-    </div>
-    <div class="message left">
-      <img class="avatar" src="https://crowdworks.jp/attachments/48051778.png?width=552&height=552" alt="相手のアバター">
-      <div class="bubble">どうしてる？</div>
-    </div>
-    <div class="message right">
-      <div class="bubble">順調です。</div>
+    <div class="message outgoing">
+      <div class="avatar"></div>
+      <div class="bubble">
+        こんばんわん 🐶
+      </div>
+      <div class="timestamp">13:07</div>
     </div>
   </div>
-  
-  <!-- 入力エリア -->
-  <div class="chat-input">
-    <input type="text" placeholder="メッセージを入力">
-    <button>送信</button>
-  </div>
+</div>
+
 </body>
 </html>
