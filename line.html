@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LINE風チャットUI</title>
+  <style>
+    /* 全体のスタイル */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #e5ddd5;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+    .chat-container {
+      max-width: 600px;
+      height: 100vh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      background-color: #fff;
+      border: 1px solid #ccc;
+    }
+    /* ヘッダー */
+    .chat-header {
+      background-color: #00c300;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    /* メッセージエリア */
+    .chat-messages {
+      flex: 1;
+      padding: 10px;
+      background-color: #e5ddd5;
+      overflow-y: auto;
+    }
+    .message {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    /* 左側のメッセージ（相手側） */
+    .message.left {
+      justify-content: flex-start;
+    }
+    .message.left .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    .message.left .bubble {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-top-left-radius: 0;
+      border-radius: 18px;
+      padding: 10px;
+      max-width: 70%;
+      position: relative;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    /* 右側のメッセージ（自分側） */
+    .message.right {
+      justify-content: flex-end;
+    }
+    .message.right .bubble {
+      background-color: #dcf8c6;
+      border: 1px solid #b2d8b2;
+      border-top-right-radius: 0;
+      border-radius: 18px;
+      padding: 10px;
+      max-width: 70%;
+      position: relative;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    /* テキスト入力エリア */
+    .chat-input {
+      display: flex;
+      align-items: center;
+      border-top: 1px solid #ccc;
+      background-color: #f7f7f7;
+    }
+    .chat-input input[type="text"] {
+      flex: 1;
+      border: none;
+      padding: 15px;
+      font-size: 16px;
+      outline: none;
+      background-color: #f7f7f7;
+    }
+    .chat-input button {
+      border: none;
+      padding: 15px 20px;
+      background-color: #00c300;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      outline: none;
+    }
+    .chat-input button:active {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- ヘッダー -->
+    <div class="chat-header">
+      LINE Chat
+    </div>
+    
+    <!-- メッセージエリア -->
+    <div class="chat-messages">
+      <!-- 受信メッセージ -->
+      <div class="message left">
+        <img class="avatar" src="https://via.placeholder.com/40" alt="相手のアバター">
+        <div class="bubble">こんにちは！</div>
+      </div>
+      <!-- 送信メッセージ -->
+      <div class="message right">
+        <div class="bubble">こんにちは！元気ですか？</div>
+      </div>
+      <!-- 受信メッセージ -->
+      <div class="message left">
+        <img class="avatar" src="https://via.placeholder.com/40" alt="相手のアバター">
+        <div class="bubble">はい、元気です。あなたは？</div>
+      </div>
+      <!-- 送信メッセージ -->
+      <div class="message right">
+        <div class="bubble">僕も元気です！</div>
+      </div>
+    </div>
+    
+    <!-- テキスト入力エリア -->
+    <div class="chat-input">
+      <input type="text" placeholder="メッセージを入力">
+      <button>送信</button>
+    </div>
+  </div>
+</body>
+</html>
