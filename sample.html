@@ -3,251 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>外国人労働者支援</title>
+    <title>外国人労働者支援アプリ</title>
     <style>
         :root {
-            --bg-color: #0d1117;
-            --card-bg: #1c2128;
-            --border-color: #30363d;
-            --text-main: #f0f6fc;
-            --text-sub: #8b949e;
-            --accent-color: #58a6ff;
-            --danger: #ff7b72;
-            --danger-bg: #da3633;
-            --success: #3fb950;
-            --warning: #d29922;
-            --nav-bg: rgba(22, 27, 34, 0.95);
+            /* 落ち着いたカラーパレット */
+            --bg-body: #f9fbfc;
+            --card-bg: #ffffff;
+            --primary-dark: #1e293b; /* 信頼感のある紺 */
+            --accent-teal: #0d9488; /* 安心感のあるグリーン */
+            --text-main: #334155;
+            --text-sub: #64748b;
+            --danger-soft: #e11d48; /* 柔らかい赤 */
+            --warning-gold: #b45309;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Helvetica Neue', Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+            background-color: var(--bg-body);
             color: var(--text-main);
             margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
-            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* アプリ外枠 */
         .app-shell {
             width: 100%;
             max-width: 480px;
             min-height: 100vh;
-            background-color: var(--bg-color);
             position: relative;
-            padding-bottom: 80px;
+            padding-bottom: 100px;
         }
 
-        /* ヘッダー */
+        /* ヘッダー：シンプルで透明感のあるデザイン */
         header {
             position: sticky;
             top: 0;
             z-index: 100;
             background: var(--nav-bg);
-            backdrop-filter: blur(10px);
-            padding: 15px 20px;
+            backdrop-filter: blur(12px);
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
         .logo {
-            font-size: 1.2rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(90deg, #58a6ff, #bc8cff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            letter-spacing: -0.02em;
         }
 
         .lang-badge {
-            font-size: 0.75rem;
-            background: #21262d;
-            border: 1px solid var(--border-color);
-            padding: 4px 10px;
-            border-radius: 20px;
+            font-size: 0.7rem;
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 100px;
             color: var(--text-sub);
+            font-weight: 600;
         }
 
-        /* メインコンテンツ */
-        main {
-            padding: 20px;
-        }
+        main { padding: 20px; }
 
-        .screen {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
+        .screen { display: none; animation: slideUp 0.4s cubic-bezier(0, 0, 0.2, 1); }
+        .screen.active { display: block; }
 
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ステータスカード */
+        /* ステータスカード：グラデーションを控えめに */
         .status-card {
-            background: linear-gradient(135deg, #1f6feb 0%, #1158c7 100%);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            background: var(--primary-dark);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            color: white;
+            box-shadow: 0 20px 25px -5px rgba(30, 41, 59, 0.2);
         }
 
-        .status-label { font-size: 0.8rem; opacity: 0.9; margin-bottom: 5px; }
-        .status-value { font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; }
-        .status-footer { display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.8; }
+        .status-label { font-size: 0.75rem; opacity: 0.7; margin-bottom: 8px; font-weight: 300; }
+        .status-value { font-size: 2rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: baseline; gap: 4px;}
+        .status-value span { font-size: 0.9rem; font-weight: 400; opacity: 0.8; }
+        .progress-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 15px; overflow: hidden; }
+        .progress-inner { height: 100%; width: 75%; background: var(--accent-teal); }
 
-        /* 企業情報カード */
+        /* 企業カード：余白とフォントで高級感を */
         .card {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 24px;
+            padding: 24px;
             margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.02);
         }
 
-        .company-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .company-name { font-size: 1.1rem; font-weight: bold; margin: 0; }
-        .location { font-size: 0.8rem; color: var(--text-sub); }
+        .company-header { margin-bottom: 16px; }
+        .company-name { font-size: 1.2rem; font-weight: 700; margin: 0 0 4px 0; color: var(--primary-dark); }
+        .location { font-size: 0.8rem; color: var(--text-sub); display: flex; align-items: center; gap: 4px; }
 
         .rating-box {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin: 16px 0;
+            padding: 12px;
+            background: #fffbeb;
+            border-radius: 12px;
         }
-
-        .stars { color: var(--warning); font-size: 1.2rem; }
-        .score { font-weight: bold; color: var(--warning); }
+        .stars { color: #f59e0b; font-size: 1rem; }
+        .score { font-weight: 700; color: #b45309; font-size: 1.1rem; }
 
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
         .stat-item {
-            background: rgba(255,255,255,0.03);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
+            background: #f8fafc;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.03);
         }
+        .stat-val { display: block; font-weight: 700; color: var(--danger-soft); font-size: 1.1rem; }
+        .stat-lab { font-size: 0.65rem; color: var(--text-sub); margin-top: 2px; display: block; }
 
-        .stat-val { display: block; font-weight: bold; color: var(--danger); }
-        .stat-lab { font-size: 0.65rem; color: var(--text-sub); }
-
-        /* クチコミ */
+        /* レビュー */
         .review-item {
-            border-left: 3px solid var(--danger);
-            background: rgba(218, 54, 51, 0.05);
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 0 8px 8px 0;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 16px;
             font-size: 0.85rem;
+            line-height: 1.6;
+            background: #fdf2f2;
+            color: #991b1b;
+            border: 1px solid #fee2e2;
         }
 
         .tag {
-            font-size: 0.7rem;
-            background: rgba(255,123,114,0.15);
-            color: var(--danger);
-            padding: 2px 6px;
+            font-size: 0.65rem;
+            background: #ef4444;
+            color: white;
+            padding: 2px 8px;
             border-radius: 4px;
-            margin-right: 5px;
-            font-weight: bold;
+            margin-right: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
-        /* ボタン */
+        /* ボタン：グラデーションとシャドウで押しやすく */
         .btn-escape {
             display: block;
             width: 100%;
-            background: var(--danger-bg);
+            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
             color: white;
             text-align: center;
-            padding: 16px;
-            border-radius: 12px;
-            font-weight: bold;
+            padding: 18px;
+            border-radius: 20px;
+            font-weight: 600;
             text-decoration: none;
-            box-shadow: 0 4px 15px rgba(218, 54, 51, 0.3);
+            box-shadow: 0 10px 20px -5px rgba(225, 29, 72, 0.4);
             border: none;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
             font-size: 1rem;
         }
+        .btn-escape:active { transform: scale(0.97); box-shadow: 0 5px 10px rgba(225, 29, 72, 0.3); }
 
-        .btn-escape:active { transform: scale(0.98); }
-
-        /* ナビゲーション */
+        /* ナビゲーション：浮遊感のあるデザイン */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 480px;
-            background: var(--nav-bg);
-            border-top: 1px solid var(--border-color);
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 440px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
             display: flex;
             justify-content: space-around;
-            padding: 12px 0 25px 0;
-            backdrop-filter: blur(10px);
+            padding: 12px 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.5);
         }
 
         .nav-item {
             background: none;
             border: none;
             color: var(--text-sub);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
+            transition: 0.3s;
         }
-
-        .nav-item.active { color: var(--accent-color); }
-        .nav-icon { font-size: 1.4rem; }
+        .nav-item.active { color: var(--accent-teal); }
+        .nav-icon { font-size: 1.2rem; }
 
         /* モーダル */
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
         }
-
         .modal {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
-            max-width: 320px;
+            background: white;
+            border-radius: 32px;
+            padding: 32px;
+            width: 100%;
+            max-width: 340px;
             text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         }
-
-        .modal-btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-confirm { flex: 1; padding: 12px; border-radius: 8px; border: none; background: var(--danger-bg); color: white; font-weight: bold; }
-        .btn-cancel { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: none; color: var(--text-main); }
-
+        .modal h3 { color: var(--primary-dark); margin-top: 16px; font-size: 1.25rem; }
+        .modal p { color: var(--text-sub); font-size: 0.9rem; line-height: 1.5; margin-bottom: 24px; }
+        
+        .modal-btn-group { display: flex; gap: 12px; }
+        .btn-confirm { flex: 1.5; padding: 14px; border-radius: 14px; border: none; background: var(--primary-dark); color: white; font-weight: 600; cursor: pointer;}
+        .btn-cancel { flex: 1; padding: 14px; border-radius: 14px; border: 1px solid #e2e8f0; background: white; color: var(--text-sub); font-weight: 600; cursor: pointer;}
     </style>
 </head>
 <body>
@@ -255,75 +245,78 @@
 <div class="app-shell">
     <header>
         <div class="logo">外国人労働者支援</div>
-        <div class="lang-badge">JP / VN</div>
+        <div class="lang-badge">日本語 / Tiếng Việt</div>
     </header>
 
     <main>
         <div id="screen-home" class="screen active">
             <div class="status-card">
-                <div class="status-label">現在の共生スコア (Điểm tích lũy)</div>
-                <div class="status-value">1,250 <span style="font-size: 1rem;">pts</span></div>
-                <div class="status-footer">
+                <div class="status-label">現在の共生スコア</div>
+                <div class="status-value">1,250 <span>pts</span></div>
+                <div class="status-footer" style="font-size: 0.75rem; opacity: 0.8; display: flex; justify-content: space-between;">
                     <span>ランク: 地域貢献リーダー</span>
                     <span>次まで 250pts</span>
                 </div>
+                <div class="progress-bar"><div class="progress-inner"></div></div>
             </div>
 
             <div class="card">
                 <div class="company-header">
-                    <div>
-                        <h2 class="company-name">株式会社 〇〇工業</h2>
-                        <span class="location">📍 愛知県豊田市</span>
-                    </div>
-                    <div class="lang-badge">製造業</div>
+                    <h2 class="company-name">株式会社 〇〇工業</h2>
+                    <span class="location">📍 愛知県豊田市 / 製造業</span>
                 </div>
 
                 <div class="rating-box">
                     <span class="stars">★★☆☆☆</span>
-                    <span class="score">2.1</span>
+                    <span class="score">2.1 / 5.0</span>
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-item">
                         <span class="stat-val">4名</span>
-                        <span class="stat-lab">3ヶ月以内の失踪者</span>
+                        <span class="stat-lab">直近の離職・失踪者</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-val">72h</span>
-                        <span class="stat-lab">月平均残業</span>
+                        <span class="stat-lab">月平均残業時間</span>
                     </div>
                 </div>
 
                 <div class="review-list">
                     <div class="review-item">
                         <span class="tag">賃金</span>
-                        残業代が計算と違います。給与明細が分かりにくい。(Tiền lương sai...)
+                        残業代の計算が契約と異なります。
                     </div>
                     <div class="review-item">
                         <span class="tag">環境</span>
-                        寮にWi-Fiがありません。社長の怒鳴り声が怖いです。
+                        寮にWi-Fiがなく、外部との連絡が困難です。
                     </div>
                 </div>
             </div>
 
             <button class="btn-escape" onclick="openModal()">
-                今すぐ転籍（脱出）を申請する<br>
-                <span style="font-size: 0.7rem; font-weight: normal;">Yêu cầu hỗ trợ chuyển việc</span>
+                環境改善・転籍を相談する<br>
+                <span style="font-size: 0.7rem; font-weight: 300; opacity: 0.9;">Hỗ trợ thay đổi môi trường làm việc</span>
             </button>
         </div>
 
         <div id="screen-search" class="screen">
-            <h2 style="margin-top: 0;">企業検索</h2>
-            <div style="background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px;">
-                <input type="text" placeholder="企業名、場所、職種で検索..." style="width: 100%; background: none; border: none; color: white; outline: none;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 20px;">企業を探す</h2>
+            <div style="background: white; padding: 16px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 20px;">
+                <input type="text" placeholder="企業名やエリアで検索..." style="width: 100%; border: none; font-size: 1rem; outline: none; color: var(--text-main);">
             </div>
-            <p style="color: var(--text-sub); text-align: center;">検索履歴がありません</p>
         </div>
 
         <div id="screen-community" class="screen">
-            <h2>コミュニティ</h2>
-            <div class="card">匿名掲示板：愛知県エリア</div>
-            <div class="card">ベトナム出身者コミュニティ</div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 20px;">つながる</h2>
+            <div class="card" style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-size: 1.5rem;">💬</div>
+                <div>愛知県エリア掲示板</div>
+            </div>
+            <div class="card" style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-size: 1.5rem;">🇻🇳</div>
+                <div>ベトナム出身者コミュニティ</div>
+            </div>
         </div>
     </main>
 
@@ -340,45 +333,36 @@
             <span class="nav-icon">🤝</span>
             <span>交流</span>
         </button>
-        <button class="nav-item" onclick="alert('設定画面へ')">
-            <span class="nav-icon">⚙️</span>
-            <span>設定</span>
+        <button class="nav-item" onclick="alert('Settings')">
+            <span class="nav-icon">👤</span>
+            <span>マイページ</span>
         </button>
     </nav>
 </div>
 
 <div id="escapeModal" class="modal-overlay">
     <div class="modal">
-        <div style="font-size: 3rem; margin-bottom: 10px;">⚠️</div>
-        <h3>脱出支援を申請しますか？</h3>
-        <p style="font-size: 0.85rem; color: var(--text-sub);">
-            専門のアドバイザーがあなたの状況を確認し、法的に安全な転籍（転職）をサポートします。<br>
-            秘密は厳守されます。
+        <div style="font-size: 2.5rem;">🌿</div>
+        <h3>リスタート相談の申請</h3>
+        <p>
+            専門のアドバイザーがあなたの今の状況を伺い、法的に守られた形での環境改善や転職をサポートします。秘密は完全に守られます。
         </p>
         <div class="modal-btn-group">
-            <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
-            <button class="btn-confirm" onclick="applyEscape()">申請する</button>
+            <button class="btn-cancel" onclick="closeModal()">戻る</button>
+            <button class="btn-confirm" onclick="applyEscape()">相談を申し込む</button>
         </div>
     </div>
 </div>
 
 <script>
-    // 画面切り替え
     function switchScreen(screenId, btn) {
-        // すべてのスクリーンを非表示
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        // 対象のスクリーンを表示
         document.getElementById('screen-' + screenId).classList.add('active');
-        
-        // ナビボタンの状態を更新
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
-        // 上部にスクロール
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // モーダル操作
     function openModal() {
         document.getElementById('escapeModal').style.display = 'flex';
     }
@@ -388,7 +372,7 @@
     }
 
     function applyEscape() {
-        alert('申請を受け付けました。専任スタッフからの連絡をお待ちください。\nBạn đã gửi yêu cầu thành công.');
+        alert('相談申請を受け付けました。安心してお待ちください。\nYêu cầu của bạn đã được gửi. Hãy yên tâm.');
         closeModal();
     }
 </script>
